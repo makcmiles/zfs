@@ -1,3 +1,4 @@
+```
 Задание 1. Определить алгоритм с наилучшим сжатием.
 
     Шаги:
@@ -10,9 +11,9 @@
 
 Выполнение:
 Создан скрипт и прописан в вагрант-файле для создания zpool и присвоение каждому алгоритмов сжатия (находятся в репозитории)
-<details>
-  <summary>Информация во время развёртывания машины </summary>
-  '''
+Информация во время развёртывания машины 
+```
+```
   max@max-VirtualBox:~/zfs$ vagrant up
 Bringing machine 'zfs' up with 'virtualbox' provider...
 ==> zfs: Importing base box 'centos/7'...
@@ -485,10 +486,10 @@ Bringing machine 'zfs' up with 'virtualbox' provider...
     zfs: Complete!
 ==> zfs: Running provisioner: shell...
     zfs: Running: /tmp/vagrant-shell20231206-11235-wt5m7y.sh
-  '''
-  </details>
+```
+
 Результат создания пулов и настройки на них компрессии
-'''
+```
 [root@zfs ~]# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sda      8:0    0   40G  0 disk 
@@ -517,26 +518,26 @@ sdh      8:112  0  512M  0 disk
 sdi      8:128  0  512M  0 disk 
 |-sdi1   8:129  0  502M  0 part 
 `-sdi9   8:137  0    8M  0 part
-'''
-'''
+```
+```
 [root@zfs ~]# zpool list 
 NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
 otus1   480M   118K   480M        -         -     0%     0%  1.00x    ONLINE  -
 otus2   480M   118K   480M        -         -     0%     0%  1.00x    ONLINE  -
 otus3   480M   118K   480M        -         -     0%     0%  1.00x    ONLINE  -
 otus4   480M   118K   480M        -         -     0%     0%  1.00x    ONLINE  -
-'''
-'''
+```
+```
 [root@zfs ~]# zfs get all | grep compression
 otus1  compression           lzjb                   local
 otus2  compression           lz4                    local
 otus3  compression           gzip-9                 local
 otus4  compression           zle                    local
-'''
+```
 Скачиваю файл http://www.gutenberg.org/ebooks/2600.txt.utf-8 на каждый раздел для проверки эффективности сжатия текстового файла
+```
+[root@zfs ~]# for i in {1..4}; do wget -P /otus$i http://www.gutenberg.org/ebooks/2600.txt.utf-8; done
 
-<details><summary>[root@zfs ~]# for i in {1..4}; do wget -P /otus$i http://www.gutenberg.org/ebooks/2600.txt.utf-8; done</summary>
-'''
 --2023-12-06 21:24:39--  http://www.gutenberg.org/ebooks/2600.txt.utf-8
 Resolving www.gutenberg.org (www.gutenberg.org)... 152.19.134.47, 2610:28:3090:3000:0:bad:cafe:47
 Connecting to www.gutenberg.org (www.gutenberg.org)|152.19.134.47|:80... connected.
@@ -629,11 +630,9 @@ Saving to: '/otus4/2600.txt.utf-8'
 
 2023-12-06 21:26:15 (3.34 MB/s) - '/otus4/2600.txt.utf-8' saved [3359630/3359630]
 
-'''
-  </details>
-
+```
 Проверяю наличие файлов и эффективность сжатия
-'''
+```
 [root@zfs ~]# ls -l /otus*
 /otus1:
 total 2443
@@ -650,16 +649,16 @@ total 1239
 /otus4:
 total 3287
 -rw-r--r--. 1 root root 3359630 Dec  2 09:16 2600.txt.utf-8
-'''
-'''
+```
+```
 [root@zfs ~]# zfs get all | grep compressratio | grep -v ref
 otus1  compressratio         1.35x                  -
 otus2  compressratio         1.62x                  -
 otus3  compressratio         2.64x                  -
 otus4  compressratio         1.01x                  -
-'''
+```
 gzip-9 показал себя лучше всех.
-
+```
 Задание 2. Определение настроек пула
 Шаги:
 загрузить архив с файлами локально.
@@ -673,9 +672,9 @@ https://drive.google.com/open?id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg
 - значение recordsize;
 - какое сжатие используется;
 - какая контрольная сумма используется.
-
+```
 Скачиваю и разархивирую архив
-'''
+```
 [root@zfs ~]# wget -O zfs_task1.tar.gz --no-check-certificate 'https://drive.usercontent.google.com/download?id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg&export=download'
 --2023-12-06 21:54:22--  https://drive.usercontent.google.com/download?id=1KRBNW33QWqbvbVHa3hLJivOAt60yukkg&export=download
 Resolving drive.usercontent.google.com (drive.usercontent.google.com)... 172.217.23.193, 2a00:1450:400e:805::2001
@@ -687,15 +686,15 @@ Saving to: 'zfs_task1.tar.gz'
 100%[====================================================================================>] 7,275,140   5.22MB/s   in 1.3s   
 
 2023-12-06 21:54:29 (5.22 MB/s) - 'zfs_task1.tar.gz' saved [7275140/7275140]
-'''
-'''
+```
+```
 [root@zfs ~]# tar -xzvf zfs_task1.tar.gz
 zpoolexport/
 zpoolexport/filea
 zpoolexport/fileb
-'''
+```
 Проверяю, возможно ли импортировать данный каталог в пул
-'''
+```
 [root@zfs ~]# zpool import -d zpoolexport/
    pool: otus
      id: 6554193320433390805
@@ -707,9 +706,9 @@ zpoolexport/fileb
 	  mirror-0                   ONLINE
 	    /root/zpoolexport/filea  ONLINE
 	    /root/zpoolexport/fileb  ONLINE
-'''
+```
 Произвожу импорт
-'''
+```
 [root@zfs ~]# zpool import -d zpoolexport/ otus
 [root@zfs ~]# zpool status
   pool: otus
@@ -776,9 +775,9 @@ config:
 	    sdi     ONLINE       0     0     0
 
 errors: No known data errors
-'''
+```
 Определяю настройки запрошенные в задание
-'''
+```
 [root@zfs ~]# zfs get available,type,recordsize,compression,checksum  otus
 NAME  PROPERTY     VALUE       SOURCE
 otus  available    350M        -
@@ -786,17 +785,16 @@ otus  type         filesystem  -
 otus  recordsize   128K        local
 otus  compression  zle         local
 otus  checksum     sha256      local
-'''
-'''
+```
+```
 Задание 3. Найти сообщение от преподавателей.
 Шаги:
 скопировать файл из удаленной директории. https://drive.google.com/file/d/1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG/view?usp=sharing
-
 восстановить файл локально. zfs receive
 найти зашифрованное сообщение в файле secret_message
-'''
+```
 Скачиваю файл снапшота
-'''
+```
 root@zfs ~]# wget -O otus_task2.file --no-check-certificate https://drive.usercontent.google.com/download?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG&export=download
 [1] 12864
 [root@zfs ~]# --2023-12-07 11:18:31--  https://drive.usercontent.google.com/download?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
@@ -812,12 +810,12 @@ Saving to: 'otus_task2.file'
 
 
 [1]+  Done                    wget -O otus_task2.file --no-check-certificate https://drive.usercontent.google.com/download?id=1gH8gCL9y7Nd5Ti3IRmplZPF1XjzxeRAG
-'''
+```
 Восстанавливаю файловую систему из снапшота и произвожу поиск скрытого сообщеия
-'''
+```
 [root@zfs ~]# zfs receive otus/storage@task2 < otus_task2.file
 [root@zfs ~]# find /otus/storage -name "secret_message"
 /otus/storage/task1/file_mess/secret_message
 [root@zfs ~]# cat /otus/storage/task1/file_mess/secret_message
 https://github.com/sindresorhus/awesome
-'''
+```
